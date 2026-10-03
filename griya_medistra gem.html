@@ -775,7 +775,7 @@
                 }, 4000);
             }
 
-            // Load the legacy Blogger archive and make article titles/search available on the new site.
+            // Load the imported legacy content stored locally in this repository.
             const archiveSearch = document.getElementById('archive-search');
             const archiveResults = document.getElementById('archive-results');
             const archiveStatus = document.getElementById('archive-status');
@@ -790,8 +790,8 @@
                 );
                 archiveResults.innerHTML = '';
                 if (!filtered.length) {
-                    archiveResults.innerHTML = '<div class="rounded-xl border border-slate-200 p-5 text-slate-500">Tidak ada artikel yang cocok dengan pencarian.</div>';
-                    archiveStatus.textContent = '0 artikel ditemukan.';
+                    archiveResults.innerHTML = '<div class="rounded-xl border border-slate-200 p-5 text-slate-500">Tidak ada konten yang cocok dengan pencarian.</div>';
+                    archiveStatus.textContent = '0 konten ditemukan.';
                     return;
                 }
                 const shown = filtered.slice(0, 60);
@@ -803,70 +803,49 @@
                     title.textContent = post.title;
                     const meta = document.createElement('p');
                     meta.className = 'text-xs text-slate-500 mt-1';
-                    meta.textContent = [post.date, post.categories.slice(0, 3).join(' · ')].filter(Boolean).join(' • ');
+                    meta.textContent = [post.isPage ? 'Informasi utama' : post.date, post.categories.slice(0, 3).join(' · ')].filter(Boolean).join(' • ');
                     const summary = document.createElement('p');
                     summary.className = 'text-sm text-slate-600 mt-3 leading-6';
-                    summary.textContent = post.summary || 'Buka isi artikel untuk membaca konten yang tersimpan.';
+                    summary.textContent = post.summary || 'Buka untuk membaca konten lengkap.';
                     const details = document.createElement('details');
                     details.className = 'mt-4 rounded-lg bg-slate-50 p-4';
                     const summaryToggle = document.createElement('summary');
                     summaryToggle.className = 'cursor-pointer font-semibold text-sky-700';
-                    summaryToggle.textContent = 'Baca isi artikel di sini';
+                    summaryToggle.textContent = 'Baca isi lengkap';
                     const fullText = document.createElement('div');
                     fullText.className = 'mt-3 whitespace-pre-line text-sm leading-7 text-slate-700';
-                    fullText.textContent = post.fullText || 'Isi lengkap tidak tersedia pada feed sumber.';
+                    fullText.textContent = post.fullText || 'Isi lengkap tidak tersedia.';
                     details.append(summaryToggle, fullText);
                     const link = document.createElement('a');
-                    link.href = post.url;
+                    link.href = post.url || 'https://terapinarkoba.blogspot.com/';
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
                     link.className = 'inline-flex items-center gap-2 mt-4 text-sky-700 font-semibold hover:underline';
-                    link.innerHTML = 'Baca artikel lengkap <i class="fa-solid fa-arrow-up-right-from-square"></i>';
+                    link.innerHTML = 'Lihat sumber lama <i class="fa-solid fa-arrow-up-right-from-square"></i>';
                     card.append(title, meta, summary, details, link);
                     archiveResults.appendChild(card);
                 });
-                archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' artikel' + (filtered.length > shown.length ? ' (maksimal 60 hasil per pencarian).' : '.');
+                archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' konten' + (filtered.length > shown.length ? ' (maksimal 60 hasil; persempit pencarian untuk hasil lainnya).' : '.');
             }
 
             if (archiveSearch) archiveSearch.addEventListener('input', renderArchive);
-            window.renderOldBlogArchive = function(data) {
-                const entries = data && data.feed && data.feed.entry ? data.feed.entry : [];
-                legacyPosts = entries.map(entry => {
-                    const alternate = (entry.link || []).find(link => link.rel === 'alternate');
-                    const raw = (entry.content && entry.content.$t) || (entry.summary && entry.summary.$t) || '';
-                    const holder = document.createElement('div');
-                    holder.innerHTML = raw;
-                    holder.querySelectorAll('script,style,iframe,object,embed').forEach(el => el.remove());
-                    const fullText = (holder.textContent || '').replace(/\\r/g, '').replace(/[ \\t]+/g, ' ').replace(/\\n\\s*\\n+/g, '\\n\\n').trim();
-                    const summary = fullText.slice(0, 360);
-                    const dateRaw = entry.published && entry.published.$t ? entry.published.$t : '';
-                    const date = dateRaw ? new Date(dateRaw).toLocaleDateString('id-ID', {year:'numeric',month:'short',day:'numeric'}) : '';
-                    return {
-                        title: (entry.title && entry.title.$t) || 'Artikel tanpa judul',
-                        summary,
-                        fullText,
-                        date,
-                        url: alternate ? alternate.href : 'https://terapinarkoba.blogspot.com/',
-                        categories: (entry.category || []).map(cat => cat.term || '')
-                    };
-                });
-                archiveFallback.classList.add('hidden');
-                renderArchive();
-            };
-
-            const archiveScript = document.createElement('script');
-            archiveScript.src = 'https://terapinarkoba.blogspot.com/feeds/posts/default?alt=json-in-script&callback=renderOldBlogArchive&max-results=500';
-            archiveScript.onerror = function() {
-                archiveStatus.textContent = 'Arsip otomatis tidak dapat dimuat dari sumber lama.';
-                archiveFallback.classList.remove('hidden');
-            };
-            document.head.appendChild(archiveScript);
-            setTimeout(() => {
-                if (!legacyPosts.length) {
-                    archiveStatus.textContent = 'Sumber arsip belum merespons. Coba buka website lama.';
+            fetch('./legacy-content.json', { cache: 'no-store' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Konten lokal belum tersedia');
+                    return response.json();
+                })
+                .then(data => {
+                    const pages = (data.pages || []).map(item => ({...item, isPage: true, categories: item.categories || []}));
+                    const posts = (data.posts || []).map(item => ({...item, isPage: false, categories: item.categories || []}));
+                    legacyPosts = pages.concat(posts);
+                    archiveFallback.classList.add('hidden');
+                    archiveStatus.textContent = 'Memuat ' + legacyPosts.length + ' konten dari arsip lokal…';
+                    renderArchive();
+                })
+                .catch(() => {
+                    archiveStatus.textContent = 'Konten arsip sedang disiapkan. Silakan coba kembali beberapa saat lagi.';
                     archiveFallback.classList.remove('hidden');
-                }
-            }, 10000);
+                });
 
             // Form Submit Handler: open WhatsApp with a prefilled consultation message
             const contactForm = document.getElementById('contactForm');
