@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Arsip artikel dan informasi Griya Medistra. Cari artikel dari website lama dalam tampilan yang rapi dan mudah dibaca.">
+  <title>Artikel & Informasi | Griya Medistra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body{font-family:Inter,sans-serif;background:#f8fafc;color:#334155}
+    .gradient-bg{background:linear-gradient(135deg,#0ea5e9 0%,#3b82f6 100%)}
+    .line-clamp-3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  </style>
+</head>
+<body class="antialiased">
+  <div class="bg-slate-900 px-4 py-2 text-sm text-slate-300">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
+      <a href="tel:082332222009" class="font-semibold hover:text-white"><i class="fa-solid fa-phone mr-2 text-sky-400"></i>0823 3222 2009</a>
+      <span>Arsip artikel dan informasi Griya Medistra</span>
+    </div>
+  </div>
+  <header class="sticky top-0 z-40 border-b border-slate-100 bg-white/95 shadow-sm backdrop-blur">
+    <nav class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <a href="./" class="flex items-center gap-3" aria-label="Griya Medistra - Beranda">
+        <span class="gradient-bg flex h-10 w-10 items-center justify-center rounded-xl text-xl text-white shadow"><i class="fa-solid fa-heart-pulse"></i></span>
+        <span class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl">Griya<span class="text-sky-600">Medistra</span></span>
+      </a>
+      <div class="flex items-center gap-3 sm:gap-6">
+        <a href="./" class="text-sm font-semibold text-slate-600 hover:text-sky-600 sm:text-base"><i class="fa-solid fa-house mr-1"></i><span class="hidden sm:inline">Beranda</span></a>
+        <a href="./#profil-tabib" class="hidden text-sm font-semibold text-slate-600 hover:text-sky-600 sm:inline">Profil Tabib</a>
+        <a href="./#konsultasi" class="rounded-full bg-sky-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-sky-700 sm:px-5">Konsultasi</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="gradient-bg px-4 py-14 text-white sm:py-20">
+      <div class="mx-auto max-w-4xl text-center">
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold"><i class="fa-regular fa-newspaper"></i> Pusat Artikel</span>
+        <h1 class="mt-5 text-3xl font-extrabold leading-tight sm:text-5xl">Artikel & Informasi</h1>
+        <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-sky-50 sm:text-lg">Jelajahi arsip tulisan dan informasi dari website sebelumnya dalam halaman khusus yang lebih rapi dan mudah ditelusuri.</p>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 sm:py-14">
+      <div class="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+        <i class="fa-solid fa-circle-info mr-2"></i>Arsip lama disediakan untuk dokumentasi dan informasi. Isinya belum tentu mencerminkan panduan medis terkini. Untuk diagnosis dan pengobatan, konsultasikan dengan tenaga kesehatan yang kompeten.
+      </div>
+      <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div class="w-full lg:max-w-xl">
+            <label for="search" class="mb-2 block text-sm font-bold text-slate-700">Cari artikel atau topik</label>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input id="search" type="search" placeholder="Contoh: rehabilitasi, narkoba, konsultasi..." class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-11 pr-4 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-100">
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <label for="category" class="text-sm font-semibold text-slate-600">Kategori</label>
+            <select id="category" class="min-w-40 rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
+              <option value="">Semua kategori</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4">
+          <p id="status" class="text-sm text-slate-500" aria-live="polite">Memuat arsip artikel…</p>
+          <a href="https://terapinarkoba.blogspot.com/" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-sky-700 hover:underline">Buka website lama <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></a>
+        </div>
+      </div>
+      <div id="results" class="mt-6 grid grid-cols-1 items-start gap-5 md:grid-cols-2 xl:grid-cols-3"></div>
+      <div id="empty" class="mt-6 hidden rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+        <i class="fa-solid fa-magnifying-glass mb-3 text-3xl text-slate-300"></i>
+        <h2 class="font-bold text-slate-800">Artikel tidak ditemukan</h2>
+        <p class="mt-1 text-sm text-slate-500">Coba kata kunci atau kategori lain.</p>
+      </div>
+      <div class="mt-8 flex flex-col items-center gap-3">
+        <p id="page-status" class="text-sm text-slate-500"></p>
+        <button id="load-more" class="hidden rounded-xl bg-sky-600 px-6 py-3 font-bold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">Tampilkan artikel lainnya</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mt-10 bg-slate-900 px-4 py-8 text-center text-sm text-slate-300">
+    <a href="./" class="font-bold text-white hover:text-sky-300">GriyaMedistra</a>
+    <span class="mx-2 text-slate-600">•</span>
+    <span>Artikel & Informasi</span>
+    <p class="mt-2 text-slate-500">© Griya Medistra. Informasi arsip bukan pengganti konsultasi medis profesional.</p>
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById('search');
+    const categorySelect = document.getElementById('category');
+    const results = document.getElementById('results');
+    const status = document.getElementById('status');
+    const pageStatus = document.getElementById('page-status');
+    const loadMore = document.getElementById('load-more');
+    const empty = document.getElementById('empty');
+    let allItems = [];
+    let visibleCount = 12;
+
+    function getFilteredItems() {
+      const q = searchInput.value.trim().toLocaleLowerCase('id');
+      const cat = categorySelect.value;
+      return allItems.filter(item => {
+        const haystack = [item.title, item.summary, item.fullText, ...(item.categories || [])].join(' ').toLocaleLowerCase('id');
+        const categories = item.categories || [];
+        return (!q || haystack.includes(q)) && (!cat || categories.includes(cat));
+      });
+    }
+
+    function makeCard(item) {
+      const card = document.createElement('article');
+      card.className = 'flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-lg';
+      const accent = document.createElement('div');
+      accent.className = 'h-1.5 gradient-bg';
+      const body = document.createElement('div');
+      body.className = 'flex flex-1 flex-col p-5';
+      const meta = document.createElement('div');
+      meta.className = 'mb-3 flex flex-wrap items-center gap-2 text-xs';
+      const badge = document.createElement('span');
+      badge.className = 'rounded-full bg-sky-50 px-3 py-1 font-bold text-sky-700';
+      badge.textContent = item.isPage ? 'Informasi' : ((item.categories || [])[0] || 'Artikel');
+      meta.appendChild(badge);
+      if (item.date) {
+        const date = document.createElement('span');
+        date.className = 'text-slate-400';
+        date.textContent = item.date;
+        meta.appendChild(date);
+      }
+      const title = document.createElement('h2');
+      title.className = 'break-words text-lg font-extrabold leading-snug text-slate-900';
+      title.textContent = item.title || 'Tanpa judul';
+      const excerpt = document.createElement('p');
+      excerpt.className = 'mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-600';
+      const summaryText = (item.summary || item.fullText || 'Arsip informasi dari website sebelumnya.').trim();
+      excerpt.textContent = summaryText.length > 220 ? summaryText.slice(0, 217).trimEnd() + '…' : summaryText;
+      body.append(meta, title, excerpt);
+      const actions = document.createElement('div');
+      actions.className = 'mt-5 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4';
+      if (item.fullText && item.fullText.trim()) {
+        const details = document.createElement('details');
+        details.className = 'min-w-0 flex-1';
+        const toggle = document.createElement('summary');
+        toggle.className = 'cursor-pointer list-none text-sm font-bold text-sky-700 hover:text-sky-900';
+        toggle.textContent = 'Baca isi artikel';
+        const content = document.createElement('div');
+        content.className = 'mt-3 max-h-80 overflow-y-auto whitespace-pre-line break-words rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-700';
+        content.textContent = item.fullText;
+        details.append(toggle, content);
+        actions.appendChild(details);
+      }
+      const source = document.createElement('a');
+      source.href = item.url || 'https://terapinarkoba.blogspot.com/';
+      source.target = '_blank';
+      source.rel = 'noopener noreferrer';
+      source.className = 'inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-sky-700';
+      source.innerHTML = 'Sumber <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
+      actions.appendChild(source);
+      body.appendChild(actions);
+      card.append(accent, body);
+      return card;
+    }
+
+    function render() {
+      const filtered = getFilteredItems();
+      const shown = filtered.slice(0, visibleCount);
+      results.replaceChildren(...shown.map(makeCard));
+      empty.classList.toggle('hidden', filtered.length !== 0);
+      status.textContent = allItems.length ? 'Ditemukan ' + filtered.length + ' dari ' + allItems.length + ' konten.' : status.textContent;
+      pageStatus.textContent = filtered.length ? 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' konten' : '';
+      loadMore.classList.toggle('hidden', shown.length >= filtered.length);
+    }
+
+    function resetAndRender() { visibleCount = 12; render(); }
+    searchInput.addEventListener('input', resetAndRender);
+    categorySelect.addEventListener('change', resetAndRender);
+    loadMore.addEventListener('click', () => { visibleCount += 12; render(); });
+
+    fetch('./legacy-content.json', { cache: 'no-store' })
+      .then(response => { if (!response.ok) throw new Error('HTTP ' + response.status); return response.json(); })
+      .then(data => {
+        const pages = (data.pages || []).map(item => ({...item, isPage: true, categories: item.categories || ['Informasi']}));
+        const posts = (data.posts || []).map(item => ({...item, isPage: false, categories: item.categories || []}));
+        allItems = pages.concat(posts);
+        const categories = [...new Set(allItems.flatMap(item => item.categories || []).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'id'));
+        categories.forEach(value => {
+          const option = document.createElement('option');
+          option.value = value; option.textContent = value; categorySelect.appendChild(option);
+        });
+        status.textContent = 'Arsip berhasil dimuat.';
+        render();
+      })
+      .catch(() => {
+        status.textContent = 'Arsip lokal belum dapat dimuat. Kamu tetap bisa membuka website lama.';
+        empty.classList.remove('hidden');
+        loadMore.classList.add('hidden');
+      });
+  </script>
+</body>
+</html>
