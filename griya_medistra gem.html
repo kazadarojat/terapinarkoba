@@ -492,7 +492,12 @@
                     <input id="archive-search" type="search" placeholder="Contoh: narkoba, rehabilitasi, depresi..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none">
                 </div>
                 <p id="archive-status" class="text-sm text-slate-500 mt-3">Memuat arsip artikel lama…</p>
-                <div id="archive-results" class="mt-5 grid grid-cols-1 gap-4"></div>
+                <div id="archive-results" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 items-start"></div>
+                <div class="mt-6 flex justify-center">
+                    <button id="archive-load-more" type="button" class="hidden rounded-xl bg-sky-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
+                        Tampilkan artikel lainnya
+                    </button>
+                </div>
                 <div id="archive-fallback" class="hidden mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
                     <p class="font-semibold text-slate-800">Arsip otomatis belum dapat dimuat.</p>
                     <p class="text-sm text-slate-600 mt-1">Kamu masih bisa membuka website lama untuk mencari artikel.</p>
@@ -781,6 +786,8 @@
             const archiveStatus = document.getElementById('archive-status');
             const archiveFallback = document.getElementById('archive-fallback');
             let legacyPosts = [];
+            let archiveLimit = 8;
+            const archiveLoadMore = document.getElementById('archive-load-more');
 
             function renderArchive() {
                 if (!archiveResults) return;
@@ -790,45 +797,71 @@
                 );
                 archiveResults.innerHTML = '';
                 if (!filtered.length) {
-                    archiveResults.innerHTML = '<div class="rounded-xl border border-slate-200 p-5 text-slate-500">Tidak ada konten yang cocok dengan pencarian.</div>';
+                    archiveResults.innerHTML = '<div class="md:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 text-slate-500">Tidak ada konten yang cocok dengan pencarian. Coba kata kunci lain.</div>';
                     archiveStatus.textContent = '0 konten ditemukan.';
+                    archiveLoadMore?.classList.add('hidden');
                     return;
                 }
-                const shown = filtered.slice(0, 60);
-                shown.forEach(post => {
+
+                const shown = filtered.slice(0, archiveLimit);
+                shown.forEach((post, index) => {
                     const card = document.createElement('article');
-                    card.className = 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition';
+                    card.className = 'min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md';
+                    const top = document.createElement('div');
+                    top.className = 'mb-3 flex items-center justify-between gap-3';
+                    const tag = document.createElement('span');
+                    tag.className = 'inline-flex max-w-full items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700';
+                    tag.textContent = post.isPage ? 'Informasi' : (post.categories[0] || 'Artikel');
+                    const date = document.createElement('span');
+                    date.className = 'shrink-0 text-xs text-slate-500';
+                    date.textContent = post.date || '';
+                    top.append(tag, date);
+
                     const title = document.createElement('h3');
-                    title.className = 'text-lg font-bold text-slate-900';
+                    title.className = 'break-words text-lg font-bold leading-snug text-slate-900';
                     title.textContent = post.title;
-                    const meta = document.createElement('p');
-                    meta.className = 'text-xs text-slate-500 mt-1';
-                    meta.textContent = [post.isPage ? 'Informasi utama' : post.date, post.categories.slice(0, 3).join(' · ')].filter(Boolean).join(' • ');
+
                     const summary = document.createElement('p');
-                    summary.className = 'text-sm text-slate-600 mt-3 leading-6';
-                    summary.textContent = post.summary || 'Buka untuk membaca konten lengkap.';
+                    summary.className = 'mt-3 break-words text-sm leading-6 text-slate-600';
+                    const excerpt = (post.summary || post.fullText || 'Arsip informasi dari website sebelumnya.').trim();
+                    summary.textContent = excerpt.length > 180 ? excerpt.slice(0, 177).trimEnd() + '…' : excerpt;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'mt-4 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4';
+
                     const details = document.createElement('details');
-                    details.className = 'mt-4 rounded-lg bg-slate-50 p-4';
+                    details.className = 'min-w-0 flex-1';
                     const summaryToggle = document.createElement('summary');
-                    summaryToggle.className = 'cursor-pointer font-semibold text-sky-700';
-                    summaryToggle.textContent = 'Baca isi lengkap';
+                    summaryToggle.className = 'cursor-pointer list-none font-semibold text-sky-700 hover:text-sky-800';
+                    summaryToggle.textContent = 'Baca isi';
                     const fullText = document.createElement('div');
-                    fullText.className = 'mt-3 whitespace-pre-line text-sm leading-7 text-slate-700';
-                    fullText.textContent = post.fullText || 'Isi lengkap tidak tersedia.';
+                    fullText.className = 'mt-3 max-h-80 overflow-y-auto whitespace-pre-line break-words rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-700';
+                    fullText.textContent = post.fullText || 'Isi lengkap belum tersedia di arsip lokal.';
                     details.append(summaryToggle, fullText);
-                    const link = document.createElement('a');
-                    link.href = post.url || 'https://terapinarkoba.blogspot.com/';
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.className = 'inline-flex items-center gap-2 mt-4 text-sky-700 font-semibold hover:underline';
-                    link.innerHTML = 'Lihat sumber lama <i class="fa-solid fa-arrow-up-right-from-square"></i>';
-                    card.append(title, meta, summary, details, link);
+
+                    const sourceLink = document.createElement('a');
+                    sourceLink.href = post.url || 'https://terapinarkoba.blogspot.com/';
+                    sourceLink.target = '_blank';
+                    sourceLink.rel = 'noopener noreferrer';
+                    sourceLink.className = 'inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-sky-700';
+                    sourceLink.innerHTML = 'Sumber lama <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
+                    actions.append(details, sourceLink);
+                    card.append(top, title, summary, actions);
                     archiveResults.appendChild(card);
                 });
-                archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' konten' + (filtered.length > shown.length ? ' (maksimal 60 hasil; persempit pencarian untuk hasil lainnya).' : '.');
+                archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' konten.';
+                if (archiveLoadMore) {
+                    archiveLoadMore.classList.toggle('hidden', filtered.length <= shown.length);
+                    archiveLoadMore.textContent = 'Tampilkan ' + Math.min(8, filtered.length - shown.length) + ' artikel lainnya';
+                }
             }
 
-            if (archiveSearch) archiveSearch.addEventListener('input', renderArchive);
+            if (archiveLoadMore) archiveLoadMore.addEventListener('click', () => {
+                archiveLimit += 8;
+                renderArchive();
+            });
+
+            if (archiveSearch) archiveSearch.addEventListener('input', () => { archiveLimit = 8; renderArchive(); });
             fetch('./legacy-content.json', { cache: 'no-store' })
                 .then(response => {
                     if (!response.ok) throw new Error('Konten lokal belum tersedia');
