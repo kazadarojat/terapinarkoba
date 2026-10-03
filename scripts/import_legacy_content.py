@@ -54,6 +54,31 @@ def fetch_static(title, path):
         print("Could not import static page", path, exc)
         return None
 
+def fetch_blogger_pages():
+    # Use Blogger's actual Pages feed rather than guessed page slugs.
+    try:
+        url = BASE + "/feeds/pages/default?alt=json&max-results=100"
+        payload = json.loads(get(url).decode("utf-8-sig"))
+        pages = []
+        for entry in payload.get("feed", {}).get("entry", []):
+            links = entry.get("link", [])
+            page_url = next((x.get("href") for x in links if x.get("rel") == "alternate"), BASE + "/")
+            raw = (entry.get("content") or entry.get("summary") or {}).get("$t", "")
+            blocks = content_from_html(raw)
+            if not blocks and page_url.startswith(BASE):
+                try:
+                    blocks = content_from_html(get(page_url))
+                except Exception as exc:
+                    print("Could not fetch static page:", page_url, exc)
+            full_text = "\n\n".join(b["text"] for b in blocks)
+            title = (entry.get("title") or {}).get("$t", "Halaman tanpa judul")
+            pages.append({"title": title, "url": page_url, "date": "", "categories": ["Informasi Utama"], "summary": full_text[:400], "fullText": full_text, "isPage": True})
+        if pages:
+            return pages
+    except Exception as exc:
+        print("Blogger Pages feed unavailable; using known page URLs:", exc)
+    return [p for title, path in STATIC_PAGES if (p := fetch_static(title, path)) and p.get("fullText") and BASE not in p.get("fullText", "")[:300]]
+
 def main():
     payload = json.loads(get(FEED).decode("utf-8-sig"))
     entries = payload.get("feed", {}).get("entry", [])
@@ -63,13 +88,19 @@ def main():
         url = next((x.get("href") for x in links if x.get("rel") == "alternate"), BASE + "/")
         raw = (entry.get("content") or entry.get("summary") or {}).get("$t", "")
         blocks = content_from_html(raw)
-        full_text = "\\n\\n".join(b["text"] for b in blocks)
+        # Some older Blogger feed entries expose only metadata; fetch the article page itself.
+        if not blocks and url and url.startswith(BASE):
+            try:
+                blocks = content_from_html(get(url))
+            except Exception as exc:
+                print("Could not fetch article body:", url, exc)
+        full_text = "\n\n".join(b["text"] for b in blocks)
         title = (entry.get("title") or {}).get("$t", "Artikel tanpa judul")
         published = (entry.get("published") or {}).get("$t", "")
         date = published[:10] if published else ""
         categories = [x.get("term","") for x in entry.get("category",[]) if x.get("term")]
         posts.append({"title":title, "url":url, "date":date, "categories":categories, "summary":full_text[:400], "fullText":full_text, "isPage":False})
-    pages = [p for title,path in STATIC_PAGES if (p := fetch_static(title,path))]
+    pages = fetch_blogger_pages()
     # Put static pages first, then newest posts.
     posts.sort(key=lambda x: x.get("date",""), reverse=True)
     output = {
