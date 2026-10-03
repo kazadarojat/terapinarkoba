@@ -742,25 +742,41 @@
                 }, 4000);
             }
 
-            // Form Submit Handler
+            // Form Submit Handler: open WhatsApp with a prefilled consultation message
             const contactForm = document.getElementById('contactForm');
-            if(contactForm) {
+            if (contactForm) {
                 contactForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    
-                    const name = document.getElementById('name').value;
-                    const btn = contactForm.querySelector('button[type="submit"]');
-                    const originalText = btn.innerHTML;
-                    
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...';
-                    btn.disabled = true;
-                    
-                    setTimeout(() => {
-                        showToast(`Terima kasih, ${name}. Keluhan Anda telah diteruskan ke Tabib Masrukhi.`, 'success');
-                        contactForm.reset();
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                    }, 1500);
+
+                    const name = contactForm.querySelector('#name')?.value.trim() || '-';
+                    const phoneFields = contactForm.querySelectorAll('input[type="tel"]');
+                    const selects = contactForm.querySelectorAll('select');
+                    const textareas = contactForm.querySelectorAll('textarea');
+
+                    const phone = phoneFields[0]?.value.trim() || '-';
+                    const serviceCategory = selects[0]?.selectedOptions[0]?.textContent.trim() || '-';
+                    const condition = textareas[0]?.value.trim() || '-';
+                    const medicalPhone = phoneFields[1]?.value.trim() || phone;
+                    const treatmentCategory = selects[1]?.selectedOptions[0]?.textContent.trim() || '-';
+                    const complaint = textareas[1]?.value.trim() || '-';
+
+                    const message = [
+                        'Halo Tabib Masrukhi, saya ingin berkonsultasi melalui website Griya Medistra.',
+                        '',
+                        'Nama: ' + name,
+                        'No. WhatsApp aktif: ' + phone,
+                        'Kategori layanan: ' + serviceCategory,
+                        'Kondisi singkat: ' + condition,
+                        '',
+                        'No. WhatsApp aktif (pengobatan): ' + medicalPhone,
+                        'Kategori pengobatan: ' + treatmentCategory,
+                        'Keluhan/riwayat penyakit: ' + complaint,
+                        '',
+                        'Mohon informasi lebih lanjut. Terima kasih.'
+                    ].join('\n');
+
+                    const whatsappUrl = 'https://wa.me/6282332222009?text=' + encodeURIComponent(message);
+                    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
                 });
             }
         });
