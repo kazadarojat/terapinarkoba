@@ -27,22 +27,22 @@ def content_from_html(raw):
     soup = BeautifulSoup(raw, "html.parser")
     for el in soup.select("script,style,iframe,object,embed,form,button,.share-buttons,.post-share-buttons"):
         el.decompose()
+    # Blogger post feeds may contain a bare HTML fragment without .post-body.
+    roots = soup.select(".post-body, .entry-content")
+    root = roots[0] if roots else (soup.body or soup)
     blocks = []
-    for el in soup.select(".post-body, .entry-content"):
-        # Process the first content container only.
-        for node in el.find_all(["h1","h2","h3","h4","p","li","blockquote","tr"]):
-            text = normalize(node.get_text(" ", strip=True))
-            if text and (not blocks or blocks[-1]["text"] != text):
-                typ = "heading" if node.name in ("h1","h2","h3","h4") else "list" if node.name == "li" else "quote" if node.name == "blockquote" else "paragraph"
-                blocks.append({"type": typ, "text": text})
-        if blocks:
-            break
+    for node in root.find_all(["h1", "h2", "h3", "h4", "p", "li", "blockquote", "tr"]):
+        # Avoid repeating a paragraph's text through nested descendants.
+        if node.find_parent(["p", "li", "blockquote", "tr"]):
+            continue
+        value = normalize(node.get_text(" ", strip=True))
+        if value and (not blocks or blocks[-1]["text"] != value):
+            kind = "heading" if node.name in ("h1", "h2", "h3", "h4") else "list" if node.name == "li" else "quote" if node.name == "blockquote" else "paragraph"
+            blocks.append({"type": kind, "text": value})
     if not blocks:
-        node = soup.select_one(".post-body, .entry-content")
-        if node:
-            text = normalize(node.get_text(" ", strip=True))
-            if text:
-                blocks.append({"type":"paragraph","text":text})
+        value = normalize(root.get_text(" ", strip=True))
+        if value:
+            blocks.append({"type": "paragraph", "text": value})
     return blocks
 
 def fetch_static(title, path):
