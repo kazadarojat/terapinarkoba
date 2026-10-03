@@ -786,7 +786,7 @@
                 if (!archiveResults) return;
                 const query = (archiveSearch?.value || '').trim().toLowerCase();
                 const filtered = legacyPosts.filter(post =>
-                    (post.title + ' ' + post.summary + ' ' + post.categories.join(' ')).toLowerCase().includes(query)
+                    (post.title + ' ' + post.summary + ' ' + post.fullText + ' ' + post.categories.join(' ')).toLowerCase().includes(query)
                 );
                 archiveResults.innerHTML = '';
                 if (!filtered.length) {
@@ -806,14 +806,23 @@
                     meta.textContent = [post.date, post.categories.slice(0, 3).join(' · ')].filter(Boolean).join(' • ');
                     const summary = document.createElement('p');
                     summary.className = 'text-sm text-slate-600 mt-3 leading-6';
-                    summary.textContent = post.summary || 'Buka artikel untuk membaca isi lengkap.';
+                    summary.textContent = post.summary || 'Buka isi artikel untuk membaca konten yang tersimpan.';
+                    const details = document.createElement('details');
+                    details.className = 'mt-4 rounded-lg bg-slate-50 p-4';
+                    const summaryToggle = document.createElement('summary');
+                    summaryToggle.className = 'cursor-pointer font-semibold text-sky-700';
+                    summaryToggle.textContent = 'Baca isi artikel di sini';
+                    const fullText = document.createElement('div');
+                    fullText.className = 'mt-3 whitespace-pre-line text-sm leading-7 text-slate-700';
+                    fullText.textContent = post.fullText || 'Isi lengkap tidak tersedia pada feed sumber.';
+                    details.append(summaryToggle, fullText);
                     const link = document.createElement('a');
                     link.href = post.url;
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
                     link.className = 'inline-flex items-center gap-2 mt-4 text-sky-700 font-semibold hover:underline';
                     link.innerHTML = 'Baca artikel lengkap <i class="fa-solid fa-arrow-up-right-from-square"></i>';
-                    card.append(title, meta, summary, link);
+                    card.append(title, meta, summary, details, link);
                     archiveResults.appendChild(card);
                 });
                 archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' artikel' + (filtered.length > shown.length ? ' (maksimal 60 hasil per pencarian).' : '.');
@@ -828,12 +837,14 @@
                     const holder = document.createElement('div');
                     holder.innerHTML = raw;
                     holder.querySelectorAll('script,style,iframe,object,embed').forEach(el => el.remove());
-                    const summary = (holder.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 360);
+                    const fullText = (holder.textContent || '').replace(/\\r/g, '').replace(/[ \\t]+/g, ' ').replace(/\\n\\s*\\n+/g, '\\n\\n').trim();
+                    const summary = fullText.slice(0, 360);
                     const dateRaw = entry.published && entry.published.$t ? entry.published.$t : '';
                     const date = dateRaw ? new Date(dateRaw).toLocaleDateString('id-ID', {year:'numeric',month:'short',day:'numeric'}) : '';
                     return {
                         title: (entry.title && entry.title.$t) || 'Artikel tanpa judul',
                         summary,
+                        fullText,
                         date,
                         url: alternate ? alternate.href : 'https://terapinarkoba.blogspot.com/',
                         categories: (entry.category || []).map(cat => cat.term || '')
