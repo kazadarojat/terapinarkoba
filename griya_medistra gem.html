@@ -69,7 +69,7 @@
                 <a href="#profil-tabib" class="text-slate-600 hover:text-sky-600 font-medium transition">Profil Tabib</a>
                 <a href="#layanan" class="text-slate-600 hover:text-sky-600 font-medium transition">Rehabilitasi</a>
                 <a href="#prosedur" class="text-slate-600 hover:text-sky-600 font-medium transition">Prosedur</a>
-                <a href="#arsip-artikel" class="text-slate-600 hover:text-sky-600 font-medium transition">Arsip Artikel</a>
+                <a href="./artikel.html" class="text-slate-600 hover:text-sky-600 font-medium transition">Artikel & Informasi</a>
                 <a href="#konsultasi" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-full font-medium transition shadow-md shadow-sky-600/20">Konsultasi Gratis</a>
             </div>
 
@@ -88,7 +88,7 @@
                 <a href="#profil-tabib" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Profil Tabib</a>
                 <a href="#layanan" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Rehabilitasi</a>
                 <a href="#prosedur" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Prosedur & Biaya</a>
-                <a href="#arsip-artikel" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Arsip Artikel Lama</a>
+                <a href="./artikel.html" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Artikel & Informasi</a>
                 <a href="#konsultasi" class="block px-3 py-3 mt-4 text-center rounded-md text-base font-medium bg-sky-600 text-white hover:bg-sky-700">Konsultasi Gratis</a>
             </div>
         </div>
@@ -476,36 +476,7 @@
 
     <!-- CTA / Konsultasi Form -->
 
-    <!-- Legacy Blog Archive -->
-    <section id="arsip-artikel" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-3xl mx-auto text-center mb-10">
-                <span class="text-sky-600 font-semibold tracking-wide uppercase text-sm">Arsip Website Lama</span>
-                <h2 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">Arsip Artikel & Informasi</h2>
-                <p class="mt-4 text-slate-600">Kumpulan artikel dari website Terapinarkoba sebelumnya. Cari judul atau topik untuk menemukan tulisan lama.</p>
-                <p class="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3 text-left">Catatan: artikel lama diarsipkan untuk dokumentasi dan belum tentu mencerminkan panduan medis terkini. Untuk diagnosis dan pengobatan, konsultasikan dengan tenaga kesehatan yang kompeten.</p>
-            </div>
-            <div class="max-w-3xl mx-auto">
-                <label for="archive-search" class="block text-sm font-semibold text-slate-700 mb-2">Cari artikel</label>
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input id="archive-search" type="search" placeholder="Contoh: narkoba, rehabilitasi, depresi..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none">
-                </div>
-                <p id="archive-status" class="text-sm text-slate-500 mt-3">Memuat arsip artikel lama…</p>
-                <div id="archive-results" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 items-start"></div>
-                <div class="mt-6 flex justify-center">
-                    <button id="archive-load-more" type="button" class="hidden rounded-xl bg-sky-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
-                        Tampilkan artikel lainnya
-                    </button>
-                </div>
-                <div id="archive-fallback" class="hidden mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
-                    <p class="font-semibold text-slate-800">Arsip otomatis belum dapat dimuat.</p>
-                    <p class="text-sm text-slate-600 mt-1">Kamu masih bisa membuka website lama untuk mencari artikel.</p>
-                    <a href="https://terapinarkoba.blogspot.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-4 text-sky-700 font-semibold hover:underline"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka website lama</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Artikel lengkap tersedia di halaman khusus artikel.html -->
 
     <section id="konsultasi" class="py-20 relative bg-slate-100">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -785,100 +756,7 @@
             const archiveResults = document.getElementById('archive-results');
             const archiveStatus = document.getElementById('archive-status');
             const archiveFallback = document.getElementById('archive-fallback');
-            let legacyPosts = [];
-            let archiveLimit = 8;
-            const archiveLoadMore = document.getElementById('archive-load-more');
-
-            function renderArchive() {
-                if (!archiveResults) return;
-                const query = (archiveSearch?.value || '').trim().toLowerCase();
-                const filtered = legacyPosts.filter(post =>
-                    (post.title + ' ' + post.summary + ' ' + post.fullText + ' ' + post.categories.join(' ')).toLowerCase().includes(query)
-                );
-                archiveResults.innerHTML = '';
-                if (!filtered.length) {
-                    archiveResults.innerHTML = '<div class="md:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 text-slate-500">Tidak ada konten yang cocok dengan pencarian. Coba kata kunci lain.</div>';
-                    archiveStatus.textContent = '0 konten ditemukan.';
-                    archiveLoadMore?.classList.add('hidden');
-                    return;
-                }
-
-                const shown = filtered.slice(0, archiveLimit);
-                shown.forEach((post, index) => {
-                    const card = document.createElement('article');
-                    card.className = 'min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md';
-                    const top = document.createElement('div');
-                    top.className = 'mb-3 flex items-center justify-between gap-3';
-                    const tag = document.createElement('span');
-                    tag.className = 'inline-flex max-w-full items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700';
-                    tag.textContent = post.isPage ? 'Informasi' : (post.categories[0] || 'Artikel');
-                    const date = document.createElement('span');
-                    date.className = 'shrink-0 text-xs text-slate-500';
-                    date.textContent = post.date || '';
-                    top.append(tag, date);
-
-                    const title = document.createElement('h3');
-                    title.className = 'break-words text-lg font-bold leading-snug text-slate-900';
-                    title.textContent = post.title;
-
-                    const summary = document.createElement('p');
-                    summary.className = 'mt-3 break-words text-sm leading-6 text-slate-600';
-                    const excerpt = (post.summary || post.fullText || 'Arsip informasi dari website sebelumnya.').trim();
-                    summary.textContent = excerpt.length > 180 ? excerpt.slice(0, 177).trimEnd() + '…' : excerpt;
-
-                    const actions = document.createElement('div');
-                    actions.className = 'mt-4 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4';
-
-                    const details = document.createElement('details');
-                    details.className = 'min-w-0 flex-1';
-                    const summaryToggle = document.createElement('summary');
-                    summaryToggle.className = 'cursor-pointer list-none font-semibold text-sky-700 hover:text-sky-800';
-                    summaryToggle.textContent = 'Baca isi';
-                    const fullText = document.createElement('div');
-                    fullText.className = 'mt-3 max-h-80 overflow-y-auto whitespace-pre-line break-words rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-700';
-                    fullText.textContent = post.fullText || 'Isi lengkap belum tersedia di arsip lokal.';
-                    details.append(summaryToggle, fullText);
-
-                    const sourceLink = document.createElement('a');
-                    sourceLink.href = post.url || 'https://terapinarkoba.blogspot.com/';
-                    sourceLink.target = '_blank';
-                    sourceLink.rel = 'noopener noreferrer';
-                    sourceLink.className = 'inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-sky-700';
-                    sourceLink.innerHTML = 'Sumber lama <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>';
-                    actions.append(details, sourceLink);
-                    card.append(top, title, summary, actions);
-                    archiveResults.appendChild(card);
-                });
-                archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' konten.';
-                if (archiveLoadMore) {
-                    archiveLoadMore.classList.toggle('hidden', filtered.length <= shown.length);
-                    archiveLoadMore.textContent = 'Tampilkan ' + Math.min(8, filtered.length - shown.length) + ' artikel lainnya';
-                }
-            }
-
-            if (archiveLoadMore) archiveLoadMore.addEventListener('click', () => {
-                archiveLimit += 8;
-                renderArchive();
-            });
-
-            if (archiveSearch) archiveSearch.addEventListener('input', () => { archiveLimit = 8; renderArchive(); });
-            fetch('./legacy-content.json', { cache: 'no-store' })
-                .then(response => {
-                    if (!response.ok) throw new Error('Konten lokal belum tersedia');
-                    return response.json();
-                })
-                .then(data => {
-                    const pages = (data.pages || []).map(item => ({...item, isPage: true, categories: item.categories || []}));
-                    const posts = (data.posts || []).map(item => ({...item, isPage: false, categories: item.categories || []}));
-                    legacyPosts = pages.concat(posts);
-                    archiveFallback.classList.add('hidden');
-                    archiveStatus.textContent = 'Memuat ' + legacyPosts.length + ' konten dari arsip lokal…';
-                    renderArchive();
-                })
-                .catch(() => {
-                    archiveStatus.textContent = 'Konten arsip sedang disiapkan. Silakan coba kembali beberapa saat lagi.';
-                    archiveFallback.classList.remove('hidden');
-                });
+            // Arsip artikel dipisahkan ke halaman khusus: ./artikel.html
 
             // Form Submit Handler: open WhatsApp with a prefilled consultation message
             const contactForm = document.getElementById('contactForm');
