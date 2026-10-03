@@ -69,6 +69,7 @@
                 <a href="#profil-tabib" class="text-slate-600 hover:text-sky-600 font-medium transition">Profil Tabib</a>
                 <a href="#layanan" class="text-slate-600 hover:text-sky-600 font-medium transition">Rehabilitasi</a>
                 <a href="#prosedur" class="text-slate-600 hover:text-sky-600 font-medium transition">Prosedur</a>
+                <a href="#arsip-artikel" class="text-slate-600 hover:text-sky-600 font-medium transition">Arsip Artikel</a>
                 <a href="#konsultasi" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-full font-medium transition shadow-md shadow-sky-600/20">Konsultasi Gratis</a>
             </div>
 
@@ -87,6 +88,7 @@
                 <a href="#profil-tabib" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Profil Tabib</a>
                 <a href="#layanan" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Rehabilitasi</a>
                 <a href="#prosedur" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Prosedur & Biaya</a>
+                <a href="#arsip-artikel" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-sky-600 hover:bg-slate-50">Arsip Artikel Lama</a>
                 <a href="#konsultasi" class="block px-3 py-3 mt-4 text-center rounded-md text-base font-medium bg-sky-600 text-white hover:bg-sky-700">Konsultasi Gratis</a>
             </div>
         </div>
@@ -473,6 +475,33 @@
     </section>
 
     <!-- CTA / Konsultasi Form -->
+
+    <!-- Legacy Blog Archive -->
+    <section id="arsip-artikel" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center mb-10">
+                <span class="text-sky-600 font-semibold tracking-wide uppercase text-sm">Arsip Website Lama</span>
+                <h2 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">Arsip Artikel & Informasi</h2>
+                <p class="mt-4 text-slate-600">Kumpulan artikel dari website Terapinarkoba sebelumnya. Cari judul atau topik untuk menemukan tulisan lama.</p>
+                <p class="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3 text-left">Catatan: artikel lama diarsipkan untuk dokumentasi dan belum tentu mencerminkan panduan medis terkini. Untuk diagnosis dan pengobatan, konsultasikan dengan tenaga kesehatan yang kompeten.</p>
+            </div>
+            <div class="max-w-3xl mx-auto">
+                <label for="archive-search" class="block text-sm font-semibold text-slate-700 mb-2">Cari artikel</label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input id="archive-search" type="search" placeholder="Contoh: narkoba, rehabilitasi, depresi..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none">
+                </div>
+                <p id="archive-status" class="text-sm text-slate-500 mt-3">Memuat arsip artikel lama…</p>
+                <div id="archive-results" class="mt-5 grid grid-cols-1 gap-4"></div>
+                <div id="archive-fallback" class="hidden mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
+                    <p class="font-semibold text-slate-800">Arsip otomatis belum dapat dimuat.</p>
+                    <p class="text-sm text-slate-600 mt-1">Kamu masih bisa membuka website lama untuk mencari artikel.</p>
+                    <a href="https://terapinarkoba.blogspot.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-4 text-sky-700 font-semibold hover:underline"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka website lama</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="konsultasi" class="py-20 relative bg-slate-100">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-10">
@@ -745,6 +774,88 @@
                     }, 300);
                 }, 4000);
             }
+
+            // Load the legacy Blogger archive and make article titles/search available on the new site.
+            const archiveSearch = document.getElementById('archive-search');
+            const archiveResults = document.getElementById('archive-results');
+            const archiveStatus = document.getElementById('archive-status');
+            const archiveFallback = document.getElementById('archive-fallback');
+            let legacyPosts = [];
+
+            function renderArchive() {
+                if (!archiveResults) return;
+                const query = (archiveSearch?.value || '').trim().toLowerCase();
+                const filtered = legacyPosts.filter(post =>
+                    (post.title + ' ' + post.summary + ' ' + post.categories.join(' ')).toLowerCase().includes(query)
+                );
+                archiveResults.innerHTML = '';
+                if (!filtered.length) {
+                    archiveResults.innerHTML = '<div class="rounded-xl border border-slate-200 p-5 text-slate-500">Tidak ada artikel yang cocok dengan pencarian.</div>';
+                    archiveStatus.textContent = '0 artikel ditemukan.';
+                    return;
+                }
+                const shown = filtered.slice(0, 60);
+                shown.forEach(post => {
+                    const card = document.createElement('article');
+                    card.className = 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition';
+                    const title = document.createElement('h3');
+                    title.className = 'text-lg font-bold text-slate-900';
+                    title.textContent = post.title;
+                    const meta = document.createElement('p');
+                    meta.className = 'text-xs text-slate-500 mt-1';
+                    meta.textContent = [post.date, post.categories.slice(0, 3).join(' · ')].filter(Boolean).join(' • ');
+                    const summary = document.createElement('p');
+                    summary.className = 'text-sm text-slate-600 mt-3 leading-6';
+                    summary.textContent = post.summary || 'Buka artikel untuk membaca isi lengkap.';
+                    const link = document.createElement('a');
+                    link.href = post.url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = 'inline-flex items-center gap-2 mt-4 text-sky-700 font-semibold hover:underline';
+                    link.innerHTML = 'Baca artikel lengkap <i class="fa-solid fa-arrow-up-right-from-square"></i>';
+                    card.append(title, meta, summary, link);
+                    archiveResults.appendChild(card);
+                });
+                archiveStatus.textContent = 'Menampilkan ' + shown.length + ' dari ' + filtered.length + ' artikel' + (filtered.length > shown.length ? ' (maksimal 60 hasil per pencarian).' : '.');
+            }
+
+            if (archiveSearch) archiveSearch.addEventListener('input', renderArchive);
+            window.renderOldBlogArchive = function(data) {
+                const entries = data && data.feed && data.feed.entry ? data.feed.entry : [];
+                legacyPosts = entries.map(entry => {
+                    const alternate = (entry.link || []).find(link => link.rel === 'alternate');
+                    const raw = (entry.content && entry.content.$t) || (entry.summary && entry.summary.$t) || '';
+                    const holder = document.createElement('div');
+                    holder.innerHTML = raw;
+                    holder.querySelectorAll('script,style,iframe,object,embed').forEach(el => el.remove());
+                    const summary = (holder.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 360);
+                    const dateRaw = entry.published && entry.published.$t ? entry.published.$t : '';
+                    const date = dateRaw ? new Date(dateRaw).toLocaleDateString('id-ID', {year:'numeric',month:'short',day:'numeric'}) : '';
+                    return {
+                        title: (entry.title && entry.title.$t) || 'Artikel tanpa judul',
+                        summary,
+                        date,
+                        url: alternate ? alternate.href : 'https://terapinarkoba.blogspot.com/',
+                        categories: (entry.category || []).map(cat => cat.term || '')
+                    };
+                });
+                archiveFallback.classList.add('hidden');
+                renderArchive();
+            };
+
+            const archiveScript = document.createElement('script');
+            archiveScript.src = 'https://terapinarkoba.blogspot.com/feeds/posts/default?alt=json-in-script&callback=renderOldBlogArchive&max-results=500';
+            archiveScript.onerror = function() {
+                archiveStatus.textContent = 'Arsip otomatis tidak dapat dimuat dari sumber lama.';
+                archiveFallback.classList.remove('hidden');
+            };
+            document.head.appendChild(archiveScript);
+            setTimeout(() => {
+                if (!legacyPosts.length) {
+                    archiveStatus.textContent = 'Sumber arsip belum merespons. Coba buka website lama.';
+                    archiveFallback.classList.remove('hidden');
+                }
+            }, 10000);
 
             // Form Submit Handler: open WhatsApp with a prefilled consultation message
             const contactForm = document.getElementById('contactForm');
