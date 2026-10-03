@@ -35,5 +35,6 @@ jobs:
             echo "No content changes."
           else
             git commit -m "Import legacy website content into new design"
+            git pull --rebase origin main
             git push
           fi
