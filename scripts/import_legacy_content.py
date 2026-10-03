@@ -21,7 +21,7 @@ def get(url):
         return response.read()
 
 def normalize(text):
-    return re.sub(r"\\s+", " ", text or "").strip()
+    return re.sub(r"\s+", " ", text or "").strip()
 
 def content_from_html(raw):
     soup = BeautifulSoup(raw, "html.parser")
